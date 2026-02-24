@@ -1,0 +1,18 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users can read their own profile and create it. No one can delete or update it through the client.
+    match /users/{userId} {
+      allow read, create: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Authenticated users can create service requests.
+    // Users can read their own service requests.
+    // Admins (in the future) can read/write all requests.
+    match /serviceRequests/{requestId} {
+      allow create: if request.auth != null;
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+  }
+}

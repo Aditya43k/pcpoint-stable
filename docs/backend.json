@@ -1,0 +1,100 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Represents a user's profile in the system.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "The user's unique ID."
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "The user's email address."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The user's display name."
+        }
+      },
+      "required": ["uid", "email"]
+    },
+    "ServiceRequest": {
+      "title": "Service Request",
+      "description": "A request for a service from a customer.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "customerName": {
+          "type": "string"
+        },
+        "customerEmail": {
+          "type": "string",
+          "format": "email"
+        },
+        "deviceType": {
+          "type": "string",
+          "enum": ["Laptop", "Desktop", "Printer", "Software"]
+        },
+        "brand": {
+          "type": "string"
+        },
+        "osVersion": {
+          "type": "string"
+        },
+        "issueDescription": {
+          "type": "string"
+        },
+        "errorMessages": {
+          "type": "string"
+        },
+        "status": {
+            "type": "string",
+            "enum": ["Pending", "Scheduled", "Declined", "In Progress", "Awaiting Parts", "Completed", "Cancelled", "Paid"]
+        },
+        "submittedAt": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "appointmentDate": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "cost": {
+          "type": "number",
+          "description": "The final cost of the service."
+        },
+        "invoiceNotes": {
+            "type": "string",
+            "description": "Notes from the admin for the final bill."
+        }
+      },
+      "required": ["userId", "customerName", "customerEmail", "deviceType", "brand", "issueDescription", "status", "submittedAt", "updatedAt"]
+    }
+  },
+  "auth": {
+    "providers": ["password", "google.com"]
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/UserProfile"
+      },
+      "description": "Stores user profile information."
+    },
+    "/serviceRequests/{requestId}": {
+        "schema": {
+            "$ref": "#/entities/ServiceRequest"
+        },
+        "description": "Stores all service requests."
+    }
+  }
+}
