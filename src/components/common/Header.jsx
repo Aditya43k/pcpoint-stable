@@ -8,11 +8,17 @@ import { Menu, LogOut } from 'lucide-react';
 import { useUser, useAuth } from '@/firebase';
 import { signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
 export function Header() {
   const { user, isLoading } = useUser();
   const auth = useAuth();
   const router = useRouter();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleLogout = async () => {
     if (!auth) return;
@@ -46,57 +52,59 @@ export function Header() {
         </div>
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
           <div className="md:hidden">
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Menu className="h-5 w-5" />
-                  <span className="sr-only">Toggle Menu</span>
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="pr-0">
-                <SheetHeader>
-                   <SheetTitle className="sr-only">Main Menu</SheetTitle>
-                </SheetHeader>
-                <Logo className="mb-6" />
-                <nav className="flex flex-col space-y-4">
-                  {activeNavLinks.map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className="text-foreground/70 transition-colors hover:text-foreground"
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
-                  <hr className="my-2"/>
-                  {user ? (
-                     <Button variant="ghost" onClick={handleLogout} className="justify-start text-foreground/70">
-                        Logout
-                     </Button>
-                  ) : (
-                    <>
-                      {guestLinks.map((link) => (
-                        <Link
-                          key={link.href}
-                          href={link.href}
-                          className="text-foreground/70 transition-colors hover:text-foreground"
-                        >
-                          {link.label}
-                        </Link>
-                      ))}
-                       <hr className="my-2"/>
-                       <Link
-                          key={adminLink.href}
-                          href={adminLink.href}
-                          className="text-foreground/70 transition-colors hover:text-foreground"
-                        >
-                          {adminLink.label}
-                        </Link>
-                    </>
-                  )}
-                </nav>
-              </SheetContent>
-            </Sheet>
+            {isClient && (
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <Menu className="h-5 w-5" />
+                    <span className="sr-only">Toggle Menu</span>
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="pr-0">
+                  <SheetHeader>
+                     <SheetTitle className="sr-only">Main Menu</SheetTitle>
+                  </SheetHeader>
+                  <Logo className="mb-6" />
+                  <nav className="flex flex-col space-y-4">
+                    {activeNavLinks.map((link) => (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        className="text-foreground/70 transition-colors hover:text-foreground"
+                      >
+                        {link.label}
+                      </Link>
+                    ))}
+                    <hr className="my-2"/>
+                    {user ? (
+                       <Button variant="ghost" onClick={handleLogout} className="justify-start text-foreground/70">
+                          Logout
+                       </Button>
+                    ) : (
+                      <>
+                        {guestLinks.map((link) => (
+                          <Link
+                            key={link.href}
+                            href={link.href}
+                            className="text-foreground/70 transition-colors hover:text-foreground"
+                          >
+                            {link.label}
+                          </Link>
+                        ))}
+                         <hr className="my-2"/>
+                         <Link
+                            key={adminLink.href}
+                            href={adminLink.href}
+                            className="text-foreground/70 transition-colors hover:text-foreground"
+                          >
+                            {adminLink.label}
+                          </Link>
+                      </>
+                    )}
+                  </nav>
+                </SheetContent>
+              </Sheet>
+            )}
           </div>
           <nav className="hidden md:flex md:items-center md:gap-4 lg:gap-6">
             {activeNavLinks.map((link) => (

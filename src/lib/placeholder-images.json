@@ -7,6 +7,12 @@
       "imageHint": "tech repair"
     },
     {
+      "id": "auth-background",
+      "description": "A modern laptop on a clean, minimalist desk setup.",
+      "imageUrl": "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop",
+      "imageHint": "laptop desk"
+    },
+    {
       "id": "feature-fast-triage",
       "description": "Icon representing fast diagnosis or triage of a computer issue.",
       "imageUrl": "https://images.unsplash.com/photo-1702922642456-1b0fd1274770?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxzcGVlZCUyMGdhdWdlfGVufDB8fHx8MTc3MTU3MTE0N3ww&ixlib=rb-4.1.0&q=80&w=1080",
