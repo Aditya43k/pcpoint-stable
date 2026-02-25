@@ -49,7 +49,6 @@ const formSchema = z.object({
   brand: z.string({ required_error: 'Please select an option.' }).min(1, { message: 'Please select an option.' }),
   osVersion: z.string().min(2, { message: 'This field is required.' }),
   issueDescription: z.string().min(20, { message: 'Please provide a detailed description of at least 20 characters.' }),
-  errorMessages: z.string().optional(),
   appointmentDate: z.date().optional(),
 });
 
@@ -68,7 +67,6 @@ export function ServiceRequestForm() {
       brand: '',
       osVersion: '',
       issueDescription: '',
-      errorMessages: '',
     },
   });
 
@@ -97,10 +95,21 @@ export function ServiceRequestForm() {
   }, [deviceType, form]);
 
   useEffect(() => {
-    if (deviceType === 'Software') {
+    // If it's a printer, set osVersion to 'N/A' to pass validation since field is hidden.
+    if (deviceType === 'Printer') {
+      form.setValue('osVersion', 'N/A', { shouldValidate: true });
+    }
+    // If it's software, reset the field because it might be for antivirus brand.
+    else if (deviceType === 'Software') {
       form.resetField('osVersion', { defaultValue: '' });
     }
-  }, [brand, deviceType, form]);
+    // If switching to Laptop/Desktop from printer, clear the 'N/A' value.
+    else {
+      if (form.getValues('osVersion') === 'N/A') {
+        form.setValue('osVersion', '', { shouldValidate: true });
+      }
+    }
+  }, [deviceType, brand, form]);
 
   async function onSubmit(values) {
     if (!user || !firestore) {
@@ -216,46 +225,50 @@ export function ServiceRequestForm() {
             />
           </div>
 
-          {isAntivirusRequest ? (
-            <FormField
-              control={form.control}
-              name="osVersion"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Antivirus Brand</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value || ''}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select an antivirus brand" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {antivirusBrands.map((avBrand) => (
-                        <SelectItem key={avBrand} value={avBrand}>{avBrand}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormDescription>
-                    Select 'Other' if your brand is not listed and specify it in the description below.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
+          {deviceType !== 'Printer' && (
+            <>
+              {isAntivirusRequest ? (
+                <FormField
+                  control={form.control}
+                  name="osVersion"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Antivirus Brand</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value || ''}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select an antivirus brand" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {antivirusBrands.map((avBrand) => (
+                            <SelectItem key={avBrand} value={avBrand}>{avBrand}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormDescription>
+                        Select 'Other' if your brand is not listed and specify it in the description below.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ) : (
+                <FormField
+                    control={form.control}
+                    name="osVersion"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Operating System &amp; Version</FormLabel>
+                        <FormControl>
+                          <Input placeholder="e.g., Windows 11, macOS Sonoma, N/A" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
               )}
-            />
-          ) : (
-             <FormField
-                control={form.control}
-                name="osVersion"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Operating System &amp; Version</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g., Windows 11, macOS Sonoma, N/A" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            </>
           )}
 
           <FormField
@@ -279,24 +292,6 @@ export function ServiceRequestForm() {
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="errorMessages"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Error Messages (if any)</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Copy and paste any error messages or codes you see."
-                    rows={3}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
           <FormField
             control={form.control}
             name="appointmentDate"
